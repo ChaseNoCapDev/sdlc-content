@@ -1,0 +1,110 @@
+id: requirements-spec
+name: Requirements Specification
+category: document
+phase: requirements
+version: 1.0.0
+parent: document-base
+description: Template for software requirements specification
+variables:
+  - name: systemName
+    description: Name of the system being specified
+    type: string
+    required: true
+  - name: stakeholders
+    description: List of project stakeholders
+    type: array
+    required: true
+  - name: functionalRequirements
+    description: Functional requirements list
+    type: array
+    required: true
+  - name: nonFunctionalRequirements
+    description: Non-functional requirements list
+    type: array
+    required: true
+tags:
+  - requirements
+  - specification
+  - phase-document
+content: |
+  # Software Requirements Specification
+
+  **System**: {{systemName}}  
+  **Project**: {{projectName}}  
+  **Version**: {{version}}  
+  **Author**: {{author}}  
+  **Date**: {{date}}  
+
+  ---
+
+  ## Executive Summary
+
+  This Software Requirements Specification (SRS) documents the requirements for {{systemName}}.
+
+  ## Stakeholders
+
+  {{#each stakeholders as stakeholder}}
+  - **{{stakeholder.name}}** ({{stakeholder.role}}): {{stakeholder.interest}}
+  {{/each}}
+
+  ## System Overview
+
+  {{systemName}} is designed to...
+
+  ## Functional Requirements
+
+  {{#each functionalRequirements as req}}
+  ### {{req.id}}: {{req.title}}
+
+  **Priority**: {{req.priority}}  
+  **Description**: {{req.description}}
+
+  **Acceptance Criteria**:
+  {{#each req.criteria as criterion}}
+  - {{criterion}}
+  {{/each}}
+
+  {{/each}}
+
+  ## Non-Functional Requirements
+
+  {{#each nonFunctionalRequirements as req}}
+  ### {{req.category}}: {{req.title}}
+
+  **Requirement**: {{req.description}}  
+  **Measure**: {{req.measure}}  
+  **Target**: {{req.target}}
+
+  {{/each}}
+
+  ## Constraints
+
+  ### Technical Constraints
+  - Platform requirements
+  - Integration constraints
+  - Performance constraints
+
+  ### Business Constraints
+  - Budget limitations
+  - Timeline requirements
+  - Regulatory compliance
+
+  ## Assumptions and Dependencies
+
+  ### Assumptions
+  - Resource availability
+  - Technology stability
+  - Stakeholder commitment
+
+  ### Dependencies
+  - External systems
+  - Third-party services
+  - Data sources
+
+  ## Appendices
+
+  ### A. Glossary
+  Key terms and definitions
+
+  ### B. References
+  Related documentation and standards

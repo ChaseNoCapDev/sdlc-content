@@ -1,0 +1,71 @@
+id: document-base
+name: Base Document Template
+category: document
+version: 1.0.0
+description: Base template for all SDLC documents
+variables:
+  - name: documentTitle
+    description: Title of the document
+    type: string
+    required: true
+  - name: projectName
+    description: Name of the project
+    type: string
+    required: true
+  - name: version
+    description: Document version
+    type: string
+    required: true
+    default: "1.0.0"
+  - name: author
+    description: Document author
+    type: string
+    required: true
+  - name: date
+    description: Creation date
+    type: date
+    required: true
+tags:
+  - base
+  - document
+content: |
+  # {{documentTitle}}
+
+  **Project**: {{projectName}}  
+  **Version**: {{version}}  
+  **Author**: {{author}}  
+  **Date**: {{date}}  
+
+  ---
+
+  ## Document Control
+
+  | Version | Date | Author | Changes |
+  |---------|------|--------|---------|
+  | {{version}} | {{date}} | {{author}} | Initial version |
+
+  ## Table of Contents
+
+  1. [Introduction](#introduction)
+  2. [Purpose](#purpose)
+  3. [Scope](#scope)
+  4. [References](#references)
+
+  ---
+
+  ## Introduction
+
+  This document provides...
+
+  ## Purpose
+
+  The purpose of this document is to...
+
+  ## Scope
+
+  This document covers...
+
+  ## References
+
+  - Project documentation
+  - Related standards

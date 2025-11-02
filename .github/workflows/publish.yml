@@ -1,0 +1,170 @@
+name: Unified Package Workflow
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*.*.*'
+      - '*@*.*.*'  # Support scoped version tags (e.g., logger@1.2.3)
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Detect Mode
+        id: mode
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            echo "mode=pipeline" >> $GITHUB_OUTPUT
+            echo "publish=true" >> $GITHUB_OUTPUT
+            
+            # Extract version from tag
+            TAG=${GITHUB_REF#refs/tags/}
+            # Handle both v1.2.3 and package@1.2.3 formats
+            if [[ $TAG =~ ^v[0-9] ]]; then
+              VERSION=${TAG#v}
+            elif [[ $TAG =~ @ ]]; then
+              VERSION=${TAG#*@}
+            else
+              VERSION=$TAG
+            fi
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
+            
+            # Determine if this is a prerelease
+            if [[ $VERSION =~ -(alpha|beta|rc|preview) ]]; then
+              echo "prerelease=true" >> $GITHUB_OUTPUT
+            else
+              echo "prerelease=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "mode=development" >> $GITHUB_OUTPUT
+            echo "publish=false" >> $GITHUB_OUTPUT
+          fi
+          
+          echo "🔍 Detected mode: $(cat $GITHUB_OUTPUT)"
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@chasenocap'
+          
+      - name: Configure npm for GitHub Packages
+        run: |
+          npm config set @chasenocap:registry https://npm.pkg.github.com
+          npm config set //npm.pkg.github.com/:_authToken ${{ secrets.PAT_TOKEN }}
+          npm config set registry https://registry.npmjs.org/
+          echo "NPM configuration:"
+          npm config list
+          
+      - name: Install Dependencies
+        run: |
+          if [[ "${{ steps.mode.outputs.mode }}" == "pipeline" ]]; then
+            echo "📦 Pipeline mode - using npm ci for reproducible builds"
+            npm ci
+          else
+            echo "🔧 Development mode - using npm install"
+            npm install
+          fi
+          
+      - name: Build
+        run: |
+          echo "🏗️ Building package..."
+          npm run build
+          
+      - name: Run Tests
+        run: |
+          echo "🧪 Running tests..."
+          npm test
+          
+      - name: Run Linting
+        run: |
+          echo "🧹 Running linter..."
+          npm run lint || echo "⚠️ Linting issues found (non-blocking)"
+          
+      - name: Check TypeScript
+        run: |
+          echo "📝 Type checking..."
+          npm run typecheck
+          
+      - name: Publish Package (Pipeline Mode Only)
+        if: steps.mode.outputs.publish == 'true'
+        run: |
+          echo "📦 Publishing package version ${{ steps.mode.outputs.version }}..."
+          
+          # Set version from tag (without git operations since we're on a tag)
+          npm version ${{ steps.mode.outputs.version }} --no-git-tag-version --allow-same-version
+          
+          # Publish to GitHub Packages
+          if [[ "${{ steps.mode.outputs.prerelease }}" == "true" ]]; then
+            echo "🚧 Publishing prerelease..."
+            npm publish --tag next
+          else
+            echo "🚀 Publishing stable release..."
+            npm publish
+          fi
+          
+          echo "✅ Package published successfully!"
+          
+      - name: Create GitHub Release (Pipeline Mode Only)
+        if: steps.mode.outputs.publish == 'true'
+        run: |
+          echo "📋 Creating GitHub Release for ${{ steps.mode.outputs.tag }}..."
+          
+          # Use gh CLI to create release (more reliable than action)
+          gh release create "${{ steps.mode.outputs.tag }}" \
+            --title "Release ${{ steps.mode.outputs.version }}" \
+            --notes "## 📦 Package Release ${{ steps.mode.outputs.version }}
+          
+          Published to GitHub Packages: \`@chasenocap/${{ github.event.repository.name }}@${{ steps.mode.outputs.version }}\`
+          
+          ### Installation
+          \`\`\`bash
+          npm install @chasenocap/${{ github.event.repository.name }}@${{ steps.mode.outputs.version }}
+          \`\`\`
+          
+          ### Changes
+          See [commit history](https://github.com/${{ github.repository }}/commits/${{ steps.mode.outputs.tag }}) for details." \
+            ${{ steps.mode.outputs.prerelease == 'true' && '--prerelease' || '' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Notify Parent Repository (Pipeline Mode Only)
+        if: steps.mode.outputs.publish == 'true'
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
+          repository: ChaseNoCap/h1b-visa-analysis
+          event-type: package-published
+          client-payload: |
+            {
+              "package": "@chasenocap/${{ github.event.repository.name }}",
+              "version": "${{ steps.mode.outputs.version }}",
+              "repository": "${{ github.repository }}",
+              "tag": "${{ steps.mode.outputs.tag }}",
+              "mode": "pipeline"
+            }
+            
+      - name: Summary
+        run: |
+          echo "## 📊 Workflow Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Mode**: ${{ steps.mode.outputs.mode }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Published**: ${{ steps.mode.outputs.publish }}" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ steps.mode.outputs.publish }}" == "true" ]]; then
+            echo "- **Version**: ${{ steps.mode.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Tag**: ${{ steps.mode.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Package**: @chasenocap/${{ github.event.repository.name }}" >> $GITHUB_STEP_SUMMARY
+            echo "- **Prerelease**: ${{ steps.mode.outputs.prerelease }}" >> $GITHUB_STEP_SUMMARY
+          fi

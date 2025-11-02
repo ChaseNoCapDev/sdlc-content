@@ -1,0 +1,98 @@
+id: code-review-checklist
+name: Code Review Checklist
+category: checklist
+phase: development
+version: 1.0.0
+description: Comprehensive checklist for code reviews
+variables:
+  - name: pullRequestId
+    type: string
+    required: true
+    description: Pull request identifier
+  - name: author
+    type: string
+    required: true
+    description: Code author
+  - name: reviewer
+    type: string
+    required: true
+    description: Code reviewer
+  - name: component
+    type: string
+    required: true
+    description: Component being reviewed
+  - name: reviewDate
+    type: date
+    required: true
+    description: Review date
+tags:
+  - code-review
+  - quality
+  - checklist
+content: |
+  # Code Review Checklist
+
+  **PR**: {{pullRequestId}}  
+  **Author**: {{author}}  
+  **Reviewer**: {{reviewer}}  
+  **Component**: {{component}}  
+  **Date**: {{reviewDate}}  
+
+  ## Functionality
+  - [ ] Code accomplishes the intended goal
+  - [ ] Edge cases are handled appropriately
+  - [ ] No obvious bugs or logic errors
+  - [ ] Backward compatibility maintained
+
+  ## Code Quality
+  - [ ] Code follows project style guidelines
+  - [ ] Naming is clear and consistent
+  - [ ] Functions are focused and single-purpose
+  - [ ] No code duplication
+  - [ ] Complex logic is well-commented
+
+  ## Testing
+  - [ ] Adequate test coverage for new code
+  - [ ] Tests are meaningful and test the right things
+  - [ ] Edge cases are tested
+  - [ ] Tests pass in CI/CD pipeline
+
+  ## Security
+  - [ ] No hardcoded credentials or secrets
+  - [ ] Input validation is proper
+  - [ ] No SQL injection vulnerabilities
+  - [ ] Authentication/authorization checks in place
+  - [ ] Sensitive data is properly encrypted
+
+  ## Performance
+  - [ ] No obvious performance issues
+  - [ ] Database queries are optimized
+  - [ ] Caching is used appropriately
+  - [ ] No memory leaks
+
+  ## Documentation
+  - [ ] Code is self-documenting where possible
+  - [ ] Complex sections have comments
+  - [ ] API documentation updated if needed
+  - [ ] README updated if needed
+
+  ## Dependencies
+  - [ ] New dependencies are justified
+  - [ ] Dependencies are up to date
+  - [ ] License compatibility checked
+  - [ ] Security vulnerabilities checked
+
+  ## Error Handling
+  - [ ] Errors are handled gracefully
+  - [ ] Error messages are helpful
+  - [ ] Logging is appropriate
+  - [ ] No sensitive data in error messages
+
+  ## Additional Notes
+  _Space for reviewer comments_
+
+  ---
+
+  **Review Decision**: [ ] Approved | [ ] Request Changes | [ ] Comment
+
+  **Reviewer Signature**: ________________________

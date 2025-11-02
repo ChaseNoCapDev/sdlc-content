@@ -1,0 +1,196 @@
+version: 1.0.0
+categories:
+  - id: requirements
+    name: Requirements Engineering
+    description: Best practices for requirements gathering and documentation
+  - id: design
+    name: System Design
+    description: Architectural and design patterns
+  - id: testing
+    name: Testing Strategies
+    description: Testing methodologies and best practices
+  - id: deployment
+    name: Deployment Practices
+    description: Deployment and release management
+
+tags:
+  - id: agile
+    name: Agile
+    description: Agile methodology practices
+    color: "#3498db"
+  - id: waterfall
+    name: Waterfall
+    description: Traditional waterfall approach
+    color: "#e74c3c"
+  - id: security
+    name: Security
+    description: Security-related practices
+    color: "#f39c12"
+  - id: performance
+    name: Performance
+    description: Performance optimization
+    color: "#27ae60"
+
+entries:
+  - id: req-elicitation-techniques
+    category: best-practice
+    phase: requirements
+    title: Requirements Elicitation Techniques
+    content: |
+      ## Effective Requirements Elicitation
+
+      ### 1. Stakeholder Interviews
+      - Conduct structured interviews with key stakeholders
+      - Use open-ended questions to discover hidden requirements
+      - Document assumptions and constraints
+
+      ### 2. Workshops and JAD Sessions
+      - Bring multiple stakeholders together
+      - Use facilitation techniques to build consensus
+      - Create visual models collaboratively
+
+      ### 3. Observation and Ethnography
+      - Observe users in their natural work environment
+      - Document actual vs. stated processes
+      - Identify pain points and inefficiencies
+
+      ### 4. Prototyping
+      - Create low-fidelity mockups early
+      - Gather feedback through user testing
+      - Iterate based on stakeholder input
+
+      ### 5. Document Analysis
+      - Review existing documentation
+      - Analyze current system artifacts
+      - Identify gaps and inconsistencies
+    tags:
+      - agile
+      - requirements
+      - stakeholder-management
+    metadata:
+      difficulty: intermediate
+      timeInvestment: high
+      roi: very-high
+
+  - id: api-versioning-strategies
+    category: best-practice
+    phase: design
+    title: API Versioning Strategies
+    content: |
+      ## API Versioning Best Practices
+
+      ### URL Path Versioning
+      ```
+      /api/v1/users
+      /api/v2/users
+      ```
+      **Pros**: Clear, cache-friendly
+      **Cons**: URL proliferation
+
+      ### Header Versioning
+      ```
+      Accept: application/vnd.company.v2+json
+      ```
+      **Pros**: Clean URLs
+      **Cons**: Less discoverable
+
+      ### Query Parameter Versioning
+      ```
+      /api/users?version=2
+      ```
+      **Pros**: Simple to implement
+      **Cons**: Can be overlooked
+
+      ### Recommendations
+      1. Use semantic versioning
+      2. Maintain backward compatibility
+      3. Deprecate gracefully
+      4. Document changes clearly
+      5. Consider API gateways for routing
+    tags:
+      - api
+      - design
+      - versioning
+    relatedEntries:
+      - backward-compatibility
+      - api-documentation
+
+  - id: test-pyramid
+    category: guideline
+    phase: testing
+    title: The Test Pyramid
+    content: |
+      ## Test Pyramid Strategy
+
+      ### Level 1: Unit Tests (70%)
+      - Fast execution
+      - Test individual components
+      - Mock external dependencies
+      - High code coverage target
+
+      ### Level 2: Integration Tests (20%)
+      - Test component interactions
+      - Verify API contracts
+      - Database integration tests
+      - Message queue tests
+
+      ### Level 3: E2E Tests (10%)
+      - Test critical user journeys
+      - Full system validation
+      - Performance benchmarks
+      - Security scans
+
+      ### Anti-Pattern: Ice Cream Cone
+      Avoid having more E2E tests than unit tests:
+      - Slow feedback loops
+      - Brittle test suites
+      - High maintenance cost
+    tags:
+      - testing
+      - quality
+      - automation
+    metadata:
+      framework: generic
+      applicability: universal
+
+  - id: feature-flags-deployment
+    category: best-practice
+    phase: deployment
+    title: Feature Flag Deployment Strategy
+    content: |
+      ## Safe Deployment with Feature Flags
+
+      ### Benefits
+      - Decouple deployment from release
+      - Enable A/B testing
+      - Quick rollback capability
+      - Gradual rollout support
+
+      ### Implementation
+      ```javascript
+      if (featureFlag.isEnabled('new-checkout-flow', userId)) {
+        return renderNewCheckout();
+      } else {
+        return renderLegacyCheckout();
+      }
+      ```
+
+      ### Best Practices
+      1. Use meaningful flag names
+      2. Clean up old flags regularly
+      3. Monitor flag performance impact
+      4. Document flag purposes
+      5. Implement flag governance
+
+      ### Tools
+      - LaunchDarkly
+      - Split.io
+      - Unleash (open source)
+      - Custom solutions
+    tags:
+      - deployment
+      - risk-management
+      - continuous-delivery
+    relatedEntries:
+      - canary-deployments
+      - blue-green-deployment
